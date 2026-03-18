@@ -1,0 +1,665 @@
+/* ============================================
+   CONTROLE DE PRESTES - DESIGN CYBER-LUXURY
+   Paleta: Deep Ocean & Electric Purple
+   Estilo: Glassmorphism com Gradientes Dinâmicos
+   ============================================ */
+
+/* Importação de fontes profissionais */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================
+   VARIÁVEIS GLOBAIS
+   ============================================ */
+:root {
+    /* Cores de Fundo - Deep Ocean */
+    --bg-main: #0a0c10;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --bg-card-hover: rgba(255, 255, 255, 0.05);
+    --bg-modal: rgba(10, 12, 16, 0.95);
+    
+    /* Cores de Texto - Silk White */
+    --text-main: #f0f2f5;
+    --text-muted: #8b949e;
+    --text-inverse: #0a0c10;
+    
+    /* Acentos Elétricos - Electric Purple */
+    --accent-glow: #7c4dff;
+    --accent-gradient: linear-gradient(135deg, #7c4dff 0%, #3d5afe 100%);
+    --accent-secondary: #3d5afe;
+    
+    /* Bordas e Vidro */
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-hover: rgba(255, 255, 255, 0.12);
+    --neon-shadow: 0 0 20px rgba(124, 77, 255, 0.2);
+    --neon-shadow-hover: 0 0 30px rgba(124, 77, 255, 0.3);
+    
+    /* Status Colors */
+    --success-bg: rgba(0, 255, 127, 0.1);
+    --success-border: #00ff7f;
+    --warning-bg: rgba(255, 193, 7, 0.1);
+    --warning-border: #ffc107;
+    --danger-bg: rgba(255, 68, 68, 0.1);
+    --danger-border: #ff4444;
+    --info-bg: rgba(124, 77, 255, 0.1);
+    --info-border: #7c4dff;
+    
+    /* Tipografia */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    
+    /* Tamanhos */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+}
+
+/* ============================================
+   ESTILOS GLOBAIS
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-main);
+    font-family: var(--font-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Efeito de gradiente de fundo sutil */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(124, 77, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(61, 90, 254, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ============================================
+   CARDS E CONTAINERS
+   ============================================ */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-glass-hover);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--neon-shadow);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-glass);
+    padding: 1.5rem 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card-header.bg-primary {
+    background: var(--accent-gradient) !important;
+    border: none;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* ============================================
+   BOTÕES PROFISSIONAIS
+   ============================================ */
+.btn {
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efeito de brilho ao passar o mouse */
+.btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.btn:hover::after {
+    opacity: 1;
+}
+
+/* Botões com gradiente */
+.btn-primary {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: 0 4px 12px rgba(124, 77, 255, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: var(--neon-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 1px solid var(--accent-glow);
+    color: var(--text-main);
+}
+
+.btn-outline-primary:hover {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--neon-shadow);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #00ff7f, #00cc66);
+    color: var(--text-inverse);
+    font-weight: 700;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: var(--text-inverse);
+    font-weight: 700;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: white;
+    font-weight: 700;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #7c4dff, #3d5afe);
+    color: white;
+    font-weight: 700;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--border-glass-hover);
+}
+
+/* Botões grandes para menu */
+.btn-outline-primary.w-100.p-3 {
+    padding: 2rem 1rem !important;
+    border-radius: var(--border-radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary.w-100.p-3:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-glow);
+    box-shadow: var(--neon-shadow);
+    transform: translateY(-4px);
+}
+
+.btn-outline-primary.w-100.p-3 i {
+    font-size: 3rem !important;
+    margin-bottom: 1rem;
+    color: var(--accent-glow);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary.w-100.p-3:hover i {
+    transform: scale(1.1);
+    color: var(--accent-secondary);
+}
+
+/* ============================================
+   TABELAS PROFISSIONAIS
+   ============================================ */
+.table {
+    color: var(--text-main);
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    width: 100%;
+}
+
+.table thead th {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-width: 1px 1px 1px 1px;
+    padding: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: var(--accent-glow);
+}
+
+.table thead th:first-child {
+    border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+}
+
+.table thead th:last-child {
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+}
+
+.table tbody tr {
+    background: var(--bg-card);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-card-hover);
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.table td {
+    padding: 1rem;
+    border: none;
+    font-size: 0.95rem;
+}
+
+.table td:first-child {
+    border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+}
+
+.table td:last-child {
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+}
+
+/* Status colors com glassmorphism */
+.table-success {
+    background: rgba(0, 255, 127, 0.1) !important;
+    border-left: 3px solid #00ff7f !important;
+}
+
+.table-warning {
+    background: rgba(255, 193, 7, 0.1) !important;
+    border-left: 3px solid #ffc107 !important;
+}
+
+.table-danger {
+    background: rgba(255, 68, 68, 0.1) !important;
+    border-left: 3px solid #ff4444 !important;
+}
+
+.table-secondary {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-left: 3px solid var(--border-glass) !important;
+}
+
+.table-info {
+    background: rgba(124, 77, 255, 0.1) !important;
+    border-left: 3px solid #7c4dff !important;
+}
+
+/* ============================================
+   FORMULÁRIOS E INPUTS
+   ============================================ */
+.form-control, .form-select {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-main);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.2);
+    color: var(--text-main);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+.form-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+/* Input group com efeito de vidro */
+.input-group {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-glass);
+    overflow: hidden;
+}
+
+.input-group .form-control {
+    border: none;
+    background: transparent;
+}
+
+.input-group .btn {
+    margin: 0;
+    border-radius: 0;
+}
+
+/* ============================================
+   MODAIS
+   ============================================ */
+.modal-content {
+    background: var(--bg-modal);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-glass);
+    padding: 1.5rem 2rem;
+}
+
+.modal-header .btn-close {
+    filter: invert(1) brightness(2);
+    opacity: 0.8;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-glass);
+    padding: 1.5rem 2rem;
+}
+
+/* ============================================
+   ALERTAS E NOTIFICAÇÕES
+   ============================================ */
+.alert {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: var(--text-main);
+    padding: 1rem 1.5rem;
+}
+
+.alert-success {
+    background: rgba(0, 255, 127, 0.1);
+    border-color: #00ff7f;
+    color: #00ff7f;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.alert-danger {
+    background: rgba(255, 68, 68, 0.1);
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.alert-info {
+    background: rgba(124, 77, 255, 0.1);
+    border-color: #7c4dff;
+    color: #7c4dff;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 1rem 2rem;
+}
+
+.navbar-brand {
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--accent-glow);
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   LISTAGEM DE SETORES
+   ============================================ */
+.list-group-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md) !important;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-glow);
+    transform: translateX(5px);
+    box-shadow: var(--neon-shadow);
+}
+
+.list-group-item-action {
+    color: var(--text-main);
+}
+
+.list-group-item-action:hover {
+    color: var(--accent-glow);
+}
+
+/* ============================================
+   BADGES E ETIQUETAS
+   ============================================ */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    border-color: var(--accent-glow);
+    box-shadow: var(--neon-shadow);
+    transform: translateY(-2px);
+}
+
+.badge.bg-secondary {
+    background: rgba(124, 77, 255, 0.1) !important;
+    border-color: #7c4dff;
+    color: #7c4dff;
+}
+
+.badge.bg-danger {
+    background: rgba(255, 68, 68, 0.1) !important;
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+/* ============================================
+   ANIMAÇÕES
+   ============================================ */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 0 20px rgba(124, 77, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(124, 77, 255, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(124, 77, 255, 0.2);
+    }
+}
+
+#resultados {
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary {
+    animation: glowPulse 3s infinite;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-outline-primary.w-100.p-3 {
+        padding: 1rem !important;
+    }
+    
+    .btn-outline-primary.w-100.p-3 i {
+        font-size: 2rem !important;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.75rem;
+    }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADA
+   ============================================ */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-glass);
+    border-radius: 5px;
+    border: 2px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-glow);
+}
+
+/* ============================================
+   TEXTO MONOESPACADO PARA EANs
+   ============================================ */
+.ean, code, .font-mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   TÍTULOS E CABEÇALHOS
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text-main) 0%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.display-4 {
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-glass);
+    color: var(--text-muted);
+    padding: 2rem;
+    margin-top: 3rem;
+}

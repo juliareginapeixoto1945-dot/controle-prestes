@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>📱 MODO BIP - CADASTRO RÁPIDO</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>⚡ INSTRUÇÕES:</strong><br>
+                1. Bipe o código do PRODUTO<br>
+                2. Bipe o código do MÊS<br>
+                3. Bipe o código do ANO<br>
+                4. O produto será registrado automaticamente!<br>
+                5. Se errar, bipe o código CANCELAR e depois o produto
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Leitor de Código de Barras</h5>
+                        </div>
+                        <div class="card-body">
+                            <input type="text" class="form-control form-control-lg" 
+                                   id="bip-input" placeholder="Aguardando código..." autofocus>
+                            
+                            <div class="mt-3" id="status-bip">
+                                <div class="alert alert-secondary">
+                                    👆 Bipe o código do PRODUTO
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3" id="info-produto" style="display: none;">
+                                <div class="alert alert-success" id="info-texto"></div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6>📋 Códigos Rápidos:</h6>
+                                <div class="row" id="codigos-rapidos">
+                                    <!-- Será preenchido via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">📦 Produtos da Sessão</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="lista-produtos-bip"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Estado do bip
+let estado = 'AGUARDANDO_PRODUTO';
+let ean_produto = null;
+let mes = null;
+let codigo_mes = null;
+let produtos_temp = [];
+
+// Códigos de validade (carregados do servidor)
+let codigosValidade = null;
+
+// Carregar códigos de validade
+fetch('/api/codigos-validade')
+    .then(response => response.json())
+    .then(data => {
+        codigosValidade = data;
+        mostrarCodigosRapidos();
+    });
+
+function mostrarCodigosRapidos() {
+    if (!codigosValidade) return;
+    
+    let html = '<div class="row">';
+    
+    // Meses
+    html += '<div class="col-md-6"><h6>Meses:</h6>';
+    codigosValidade.meses.forEach(m => {
+        html += `<span class="badge bg-secondary m-1" onclick="usarCodigo('${m.codigo_13}')">`;
+        html += `${m.nome}: ${m.codigo_13}</span> `;
+    });
+    html += '</div>';
+    
+    // Anos
+    html += '<div class="col-md-6"><h6>Anos:</h6>';
+    codigosValidade.anos.forEach(a => {
+        html += `<span class="badge bg-secondary m-1" onclick="usarCodigo('${a.codigo_13}')">`;
+        html += `${a.ano}: ${a.codigo_13}</span> `;
+    });
+    html += '</div>';
+    
+    // Cancelar
+    html += '<div class="col-12 mt-2">';
+    html += `<span class="badge bg-danger m-1" onclick="usarCodigo('${codigosValidade.cancelar}')">`;
+    html += `🚫 CANCELAR: ${codigosValidade.cancelar}</span>`;
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('codigos-rapidos').innerHTML = html;
+}
+
+function usarCodigo(codigo) {
+    document.getElementById('bip-input').value = codigo;
+    processarBip();
+}
+
+function processarBip() {
+    const codigo = document.getElementById('bip-input').value.trim();
+    if (!codigo) return;
+    
+    fetch('/api/bip/processar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({codigo: codigo})
+    })
+    .then(response => response.json())
+    .then(data => {
+        atualizarStatus(data);
+        document.getElementById('bip-input').value = '';
+        document.getElementById('bip-input').focus();
+    });
+}
+
+function atualizarStatus(data) {
+    const statusDiv = document.getElementById('status-bip');
+    const infoDiv = document.getElementById('info-produto');
+    const infoTexto = document.getElementById('info-texto');
+    
+    if (data.tipo === 'cancelar') {
+        estado = 'AGUARDANDO_CANCELAR';
+        statusDiv.innerHTML = '<div class="alert alert-danger">🚫 Modo CANCELAR ativado! Bipe o produto a cancelar.</div>';
+        return;
+    }
+    
+    if (data.tipo === 'erro') {
+        statusDiv.innerHTML = `<div class="alert alert-danger">❌ ${data.mensagem}</div>`;
+        return;
+    }
+    
+    if (data.tipo === 'mes') {
+        mes = data.valor;
+        codigo_mes = data.codigo;
+        estado = 'AGUARDANDO_ANO';
+        statusDiv.innerHTML = `<div class="alert alert-success">✅ ${data.mensagem} - Agora bipe o ANO</div>`;
+        return;
+    }
+    
+    if (data.tipo === 'ano') {
+        if (estado === 'AGUARDANDO_ANO' && ean_produto && mes) {
+            // Completou o cadastro
+            finalizarCadastro(ean_produto, mes, data.valor, codigo_mes, data.codigo);
+        } else {
+            estado = 'AGUARDANDO_PRODUTO';
+            ean_produto = null;
+            mes = null;
+            statusDiv.innerHTML = '<div class="alert alert-warning">⚠️ Fora de ordem. Bipe o produto novamente.</div>';
+        }
+        return;
+    }
+    
+    if (data.tipo === 'produto') {
+        if (estado === 'AGUARDANDO_CANCELAR') {
+            // Cancelar produto
+            cancelarProduto(data.ean);
+            estado = 'AGUARDANDO_PRODUTO';
+            return;
+        }
+        
+        ean_produto = data.ean;
+        estado = 'AGUARDANDO_MES';
+        
+        if (data.encontrado) {
+            infoDiv.style.display = 'block';
+            infoTexto.innerHTML = `✅ Produto: ${data.descricao}`;
+        } else {
+            infoDiv.style.display = 'block';
+            infoTexto.innerHTML = `⚠️ Produto não encontrado. Digite a descrição após o ano.`;
+        }
+        
+        statusDiv.innerHTML = '<div class="alert alert-success">✅ Produto reconhecido! Bipe o MÊS de validade</div>';
+    }
+}
+
+function finalizarCadastro(ean, mes, ano, cod_mes, cod_ano) {
+    let descricao = null;
+    
+    // Verifica se há uma descrição manual
+    const descricaoManual = document.getElementById('descricao-manual');
+    if (descricaoManual && descricaoManual.value) {
+        descricao = descricaoManual.value;
+    }
+    
+    fetch('/api/produtos/adicionar-bip', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            ean: ean,
+            mes: mes,
+            ano: ano,
+            descricao: descricao,
+            codigo_mes: cod_mes,
+            codigo_ano: cod_ano
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            produtos_temp.push(data.produto);
+            atualizarListaProdutos();
+            
+            document.getElementById('status-bip').innerHTML = 
+                '<div class="alert alert-success">✅ Produto registrado! Bipe o próximo PRODUTO</div>';
+            
+            if (document.getElementById('descricao-manual')) {
+                document.getElementById('descricao-manual').value = '';
+                document.getElementById('descricao-manual').style.display = 'none';
+            }
+            
+            // Limpar campo de descrição manual se existir
+            const descricaoManual = document.getElementById('descricao-manual');
+            if (descricaoManual) {
+                descricaoManual.style.display = 'none';
+                descricaoManual.value = '';
+            }
+        } else {
+            document.getElementById('status-bip').innerHTML = 
+                `<div class="alert alert-danger">❌ Erro: ${data.erro}</div>`;
+        }
+    });
+    
+    estado = 'AGUARDANDO_PRODUTO';
+    ean_produto = null;
+    mes = null;
+    codigo_mes = null;
+}
+
+function cancelarProduto(ean) {
+    fetch('/api/bip/cancelar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ean: ean})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            document.getElementById('status-bip').innerHTML = 
+                `<div class="alert alert-success">✅ ${data.mensagem}</div>`;
+            atualizarListaProdutos();
+        } else {
+            document.getElementById('status-bip').innerHTML = 
+                `<div class="alert alert-danger">❌ ${data.erro}</div>`;
+        }
+    });
+}
+
+function atualizarListaProdutos() {
+    fetch('/api/produtos-bip-temp')
+        .then(response => response.json())
+        .then(data => {
+            let html = '';
+            if (data.produtos && data.produtos.length > 0) {
+                html = '<table class="table table-sm">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th></tr></thead><tbody>';
+                data.produtos.forEach(p => {
+                    html += `<tr><td>${p.ean}</td><td>${p.descricao}</td><td>${p.validade}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            } else {
+                html = '<p class="text-muted">Nenhum produto na sessão atual</p>';
+            }
+            document.getElementById('lista-produtos-bip').innerHTML = html;
+        });
+}
+
+// Event listener para Enter no input
+document.getElementById('bip-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        processarBip();
+    }
+});
+
+// Atualizar lista a cada 5 segundos
+setInterval(atualizarListaProdutos, 5000);
+</script>
+{% endblock %}

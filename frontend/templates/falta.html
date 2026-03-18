@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-white">
+            <h5>📋 Gerenciar Produtos em Falta</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>ℹ️ IMPORTANTE:</strong>
+                <ul class="mb-0">
+                    <li>Produtos marcados como <strong>FALTA</strong> não aparecem nas listas de "Listar Todos" e "Prestes"</li>
+                    <li>Eles ainda aparecem nas estatísticas, mas contabilizados como "Em Falta"</li>
+                    <li>Para voltar a exibir o produto, remova da lista de falta</li>
+                </ul>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="nova-falta" placeholder="Descrição do produto">
+                        <button class="btn btn-success" onclick="adicionarFalta()">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="lista-faltas"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function carregarFaltas() {
+    fetch('/api/falta')
+        .then(response => response.json())
+        .then(data => {
+            let html = '<h6 class="mt-4">Produtos em falta:</h6>';
+            html += '<ul class="list-group">';
+            
+            if (data.faltas && data.faltas.length > 0) {
+                data.faltas.forEach(f => {
+                    html += `<li class="list-group-item d-flex justify-content-between align-items-center">`;
+                    html += f;
+                    html += `<button class="btn btn-sm btn-danger" onclick="removerFalta('${f}')">Remover</button>`;
+                    html += `</li>`;
+                });
+                html += '</ul>';
+                html += '<button class="btn btn-warning mt-3" onclick="limparFaltas()">Limpar Tudo</button>';
+                html += '<p class="text-muted mt-2">Total: ' + data.faltas.length + ' produto(s) em falta</p>';
+            } else {
+                html += '<li class="list-group-item text-success">Nenhum produto em falta ✓</li>';
+            }
+            
+            document.getElementById('lista-faltas').innerHTML = html;
+        });
+}
+
+function adicionarFalta() {
+    const desc = document.getElementById('nova-falta').value.trim();
+    if (!desc) return;
+    
+    fetch('/api/falta/adicionar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({descricao: desc})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            alert('✅ Produto adicionado à lista de falta');
+            document.getElementById('nova-falta').value = '';
+            carregarFaltas();
+        } else {
+            alert(data.erro || 'Erro ao adicionar');
+        }
+    });
+}
+
+function removerFalta(desc) {
+    if (confirm(`Remover "${desc}" da lista de falta?`)) {
+        fetch('/api/falta/remover', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({descricao: desc})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert('✅ Produto removido da lista de falta');
+                carregarFaltas();
+            } else {
+                alert('Erro ao remover');
+            }
+        });
+    }
+}
+
+function limparFaltas() {
+    if (confirm('⚠️ Limpar TODA a lista de faltas?')) {
+        fetch('/api/falta/limpar', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.sucesso) {
+                    alert('✅ Lista de faltas limpa');
+                    carregarFaltas();
+                }
+            });
+    }
+}
+
+carregarFaltas();
+</script>
+{% endblock %}

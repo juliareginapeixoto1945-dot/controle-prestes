@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header" style="background: var(--accent-gradient); border: none;">
+                    <h3 class="text-white text-center mb-0">🔐 Acesso ao Setor</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-center mb-4">Setor: <strong style="color: var(--accent-glow);">{{ setor }}</strong></h5>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Digite a senha para acessar este setor.
+                    </div>
+                    
+                    <form id="form-login" onsubmit="event.preventDefault(); verificarSenha();">
+                        <div class="mb-3">
+                            <label class="form-label">Senha do Setor:</label>
+                            <input type="password" class="form-control" id="senha-setor" 
+                                   placeholder="Digite a senha" required autofocus>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <a href="/" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div id="erro-login" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+</style>
+
+<script>
+function verificarSenha() {
+    const senha = document.getElementById('senha-setor').value;
+    const setor = "{{ setor }}";
+    const erroDiv = document.getElementById('erro-login');
+    
+    fetch('/api/verificar-senha-setor', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({setor: setor, senha: senha})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            // Senha correta - redireciona para o setor
+            window.location.href = '/setor/' + setor;
+        } else {
+            // Senha incorreta
+            erroDiv.style.display = 'block';
+            erroDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + data.erro;
+            document.getElementById('senha-setor').value = '';
+            document.getElementById('senha-setor').focus();
+        }
+    })
+    .catch(error => {
+        erroDiv.style.display = 'block';
+        erroDiv.innerHTML = 'Erro ao conectar com servidor';
+        console.error(error);
+    });
+}
+</script>
+{% endblock %}

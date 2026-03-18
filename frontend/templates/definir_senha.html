@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header" style="background: var(--accent-gradient); border: none;">
+                    <h3 class="text-white text-center mb-0">🔐 Gerenciar Senha do Setor</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-center mb-4">Setor: <strong style="color: var(--accent-glow);">{{ setor }}</strong></h5>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        {% if tem_senha %}
+                            Altere a senha do setor. Deixe em branco para remover a proteção.
+                        {% else %}
+                            Defina uma senha para proteger o acesso a este setor.
+                        {% endif %}
+                    </div>
+                    
+                    <form id="form-senha" onsubmit="event.preventDefault(); salvarSenha();">
+                        <div class="mb-3">
+                            <label class="form-label">Nova Senha:</label>
+                            <input type="password" class="form-control" id="nova-senha" 
+                                   placeholder="Digite a nova senha">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Confirmar Senha:</label>
+                            <input type="password" class="form-control" id="confirmar-senha" 
+                                   placeholder="Digite a senha novamente">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar
+                            </button>
+                            <a href="/setor/{{ setor }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div id="mensagem" class="alert mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function salvarSenha() {
+    const novaSenha = document.getElementById('nova-senha').value;
+    const confirmar = document.getElementById('confirmar-senha').value;
+    const setor = "{{ setor }}";
+    const msgDiv = document.getElementById('mensagem');
+    
+    // Se ambos estiverem vazios, remove a senha
+    if (!novaSenha && !confirmar) {
+        if (!confirm('Remover a proteção por senha deste setor?')) {
+            return;
+        }
+    } else if (novaSenha !== confirmar) {
+        msgDiv.style.display = 'block';
+        msgDiv.className = 'alert alert-danger';
+        msgDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> As senhas não conferem!';
+        return;
+    } else if (novaSenha.length < 4) {
+        msgDiv.style.display = 'block';
+        msgDiv.className = 'alert alert-danger';
+        msgDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> A senha deve ter pelo menos 4 caracteres!';
+        return;
+    }
+    
+    fetch('/api/definir-senha-setor', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({setor: setor, senha: novaSenha})
+    })
+    .then(response => response.json())
+    .then(data => {
+        msgDiv.style.display = 'block';
+        if (data.sucesso) {
+            msgDiv.className = 'alert alert-success';
+            msgDiv.innerHTML = '<i class="bi bi-check-circle"></i> ' + data.mensagem;
+            document.getElementById('nova-senha').value = '';
+            document.getElementById('confirmar-senha').value = '';
+            
+            // Se removeu a senha, volta após 2 segundos
+            if (!novaSenha) {
+                setTimeout(() => {
+                    window.location.href = '/setor/' + setor;
+                }, 2000);
+            }
+        } else {
+            msgDiv.className = 'alert alert-danger';
+            msgDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + data.erro;
+        }
+    })
+    .catch(error => {
+        msgDiv.style.display = 'block';
+        msgDiv.className = 'alert alert-danger';
+        msgDiv.innerHTML = 'Erro ao conectar com servidor';
+        console.error(error);
+    });
+}
+</script>
+{% endblock %}

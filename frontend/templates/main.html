@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="navbar navbar-expand-lg" style="background: var(--accent-gradient); border-bottom: 1px solid var(--border-glass);">
+    <div class="container-fluid">
+        <span class="navbar-brand" style="color: white; font-weight: 700; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            🎯 Controle de Prestes
+        </span>
+        <div class="navbar-nav ms-auto">
+            <span class="nav-link" style="color: rgba(255,255,255,0.9); font-weight: 500;">
+                <i class="bi bi-folder"></i> Setor: <strong style="color: white;">{{ setor }}</strong>
+            </span>
+            <a href="/" class="nav-link" style="color: rgba(255,255,255,0.9); font-weight: 500;">
+                <i class="bi bi-box-arrow-right"></i> Trocar setor
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Menu Principal - Setor {{ setor }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- LINHA 1: FUNÇÕES PRINCIPAIS -->
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-primary w-100 p-3" data-bs-toggle="modal" data-bs-target="#modalCadastro">
+                                <i class="bi bi-plus-circle fs-1 d-block"></i>
+                                1 - Adicionar Produto
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-success w-100 p-3" onclick="listarTodosProdutos()">
+                                <i class="bi bi-list-ul fs-1 d-block"></i>
+                                2 - Listar Todos (completos)
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-info w-100 p-3" onclick="listarProdutosAtivos()">
+                                <i class="bi bi-check-circle fs-1 d-block"></i>
+                                3 - Listar Ativos (disponíveis)
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-warning w-100 p-3" onclick="tirarPreco()">
+                                <i class="bi bi-cash-stack fs-1 d-block"></i>
+                                4 - Tirar Preço
+                            </a>
+                        </div>
+
+                        <!-- LINHA 2: FUNÇÕES DE PRESTES E CADASTRO RÁPIDO -->
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-warning w-100 p-3" onclick="verPrestes()">
+                                <i class="bi bi-exclamation-triangle fs-1 d-block"></i>
+                                5 - Prestes a Vencer
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/bip" class="btn btn-outline-primary w-100 p-3">
+                                <i class="bi bi-upc-scan fs-1 d-block"></i>
+                                6 - BIP - Cadastro Rápido
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/codigos" class="btn btn-outline-secondary w-100 p-3" target="_blank">
+                                <i class="bi bi-upc-scan fs-1 d-block"></i>
+                                7 - Códigos de Validade
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/falta" class="btn btn-outline-danger w-100 p-3">
+                                <i class="bi bi-exclamation-circle fs-1 d-block"></i>
+                                8 - Listar Falta
+                            </a>
+                        </div>
+
+                        <!-- LINHA 3: FUNÇÕES DE GESTÃO -->
+                        <div class="col-md-3">
+                            <a href="/definir-senha" class="btn btn-outline-info w-100 p-3">
+                                <i class="bi bi-shield-lock fs-1 d-block"></i>
+                                Senha do Setor
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/estatisticas" class="btn btn-outline-info w-100 p-3">
+                                <i class="bi bi-bar-chart fs-1 d-block"></i>
+                                9 - Estatísticas
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/quantidade" class="btn btn-outline-success w-100 p-3">
+                                <i class="bi bi-plus-square fs-1 d-block"></i>
+                                10 - Adicionar Quantidade
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/excluir" class="btn btn-outline-danger w-100 p-3">
+                                <i class="bi bi-trash fs-1 d-block"></i>
+                                11 - Excluir Produtos
+                            </a>
+                        </div>
+
+                        <!-- LINHA 4: MAIS FUNÇÕES E SAIR -->
+                        <div class="col-md-3">
+                            <a href="/erros" class="btn btn-outline-warning w-100 p-3">
+                                <i class="bi bi-bug fs-1 d-block"></i>
+                                12 - Erros do BIP
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <a href="#" class="btn btn-outline-secondary w-100 p-3" data-bs-toggle="modal" data-bs-target="#modalPesquisa">
+                                <i class="bi bi-search fs-1 d-block"></i>
+                                13 - Pesquisar Produtos
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <a href="/" class="btn btn-outline-dark w-100 p-3">
+                                <i class="bi bi-door-closed fs-1 d-block"></i>
+                                0 - Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de resultados -->
+    <div class="row mt-4" id="resultados" style="display: none;">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="resultado-titulo">Resultados</h5>
+                    <button class="btn btn-sm btn-light" onclick="fecharResultados()">X</button>
+                </div>
+                <div class="card-body" id="resultado-conteudo"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cadastro -->
+<div class="modal fade" id="modalCadastro" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--accent-gradient); border: none;">
+                <h5 class="modal-title text-white">Adicionar Produto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Código EAN:</label>
+                    <input type="text" class="form-control" id="ean-input" placeholder="Bipe ou digite o EAN">
+                    <button class="btn btn-sm btn-secondary mt-2" onclick="buscarProduto()">Buscar</button>
+                </div>
+                <div id="descricao-info" class="mb-3" style="display: none;">
+                    <div class="alert alert-info" id="descricao-texto"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descrição:</label>
+                    <input type="text" class="form-control" id="descricao-input" required>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">Mês:</label>
+                        <select class="form-control" id="mes-select">
+                            {% for i in range(1,13) %}
+                            <option value="{{ '%02d' % i }}">{{ '%02d' % i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Ano:</label>
+                        <select class="form-control" id="ano-select">
+                            {% for ano in range(2026,2033) %}
+                            <option>{{ ano }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Pesquisa -->
+<div class="modal fade" id="modalPesquisa" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--accent-gradient); border: none;">
+                <h5 class="modal-title text-white">Pesquisar Produtos</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Data Inicial:</label>
+                    <input type="date" class="form-control" id="data-inicial">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Data Final:</label>
+                    <input type="date" class="form-control" id="data-final">
+                </div>
+                <hr style="border-color: var(--border-glass);">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="pesquisarHoje()">Hoje</button>
+                    <button class="btn btn-outline-primary" onclick="pesquisarSemana()">Últimos 7 dias</button>
+                    <button class="btn btn-outline-primary" onclick="pesquisarMes()">Últimos 30 dias</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" onclick="pesquisarPeriodo()">Pesquisar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// FUNÇÕES GLOBAIS
+// ============================================
+function mostrarResultados(titulo, conteudo) {
+    document.getElementById('resultado-titulo').innerHTML = titulo;
+    document.getElementById('resultado-conteudo').innerHTML = conteudo;
+    document.getElementById('resultados').style.display = 'block';
+    document.getElementById('resultados').scrollIntoView({behavior: 'smooth'});
+}
+
+function fecharResultados() {
+    document.getElementById('resultados').style.display = 'none';
+}
+
+// ============================================
+// LISTAGEM DE PRODUTOS
+// ============================================
+function listarTodosProdutos() {
+    fetch('/api/produtos')
+        .then(response => response.json())
+        .then(data => {
+            if (data.produtos && data.produtos.length > 0) {
+                let html = '<p class="text-muted">Mostrando TODOS os produtos (incluindo em falta e prestes retirados)</p>';
+                html += '<div class="table-responsive">';
+                html += '<table class="table">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th><th>Status</th></tr></thead><tbody>';
+                
+                data.produtos.forEach(p => {
+                    html += `<tr class="${p.status_class}">`;
+                    html += `<td><span class="font-mono">${p.ean}</span></td>`;
+                    html += `<td>${p.descricao}</td>`;
+                    html += `<td>${p.validade}</td>`;
+                    html += `<td>${p.status}</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                html += '</div>';
+                mostrarResultados('📋 Todos os Produtos', html);
+            } else {
+                alert('Nenhum produto cadastrado neste setor');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao carregar produtos');
+            console.error(error);
+        });
+}
+
+function listarProdutosAtivos() {
+    fetch('/api/produtos/ativos')
+        .then(response => response.json())
+        .then(data => {
+            if (data.produtos && data.produtos.length > 0) {
+                let html = '<p class="text-muted">Mostrando apenas produtos disponíveis (não em falta, não retirados)</p>';
+                html += '<div class="table-responsive">';
+                html += '<table class="table">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th><th>Dias</th></tr></thead><tbody>';
+                
+                data.produtos.forEach(p => {
+                    let statusClass = '';
+                    if (p.status === 'vencido') statusClass = 'table-danger';
+                    else if (p.status === 'prestes') statusClass = 'table-warning';
+                    else statusClass = 'table-success';
+                    
+                    html += `<tr class="${statusClass}">`;
+                    html += `<td><span class="font-mono">${p.ean}</span></td>`;
+                    html += `<td>${p.descricao}</td>`;
+                    html += `<td>${p.validade}</td>`;
+                    html += `<td>${p.dias} dias</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                html += '</div>';
+                mostrarResultados('📋 Produtos Ativos (disponíveis)', html);
+            } else {
+                alert('Nenhum produto ativo neste setor');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao carregar produtos');
+            console.error(error);
+        });
+}
+
+// ============================================
+// TIRAR PREÇO (PRECIFICAÇÃO)
+// ============================================
+function tirarPreco() {
+    fetch('/api/precificacao/eans')
+        .then(response => response.json())
+        .then(data => {
+            if (data.eans && data.eans.length > 0) {
+                let html = `<p class="text-info">Total: ${data.eans.length} EANs únicos</p>`;
+                html += '<div class="alert alert-info">';
+                html += '<strong><i class="bi bi-info-circle"></i> EANs copiados para área de transferência!</strong><br>';
+                html += 'Cole no sistema de precificação (Ctrl+V)';
+                html += '</div>';
+                html += '<textarea class="form-control font-mono" rows="10" readonly id="eans-textarea">';
+                html += data.eans.join('\n');
+                html += '</textarea>';
+                html += '<button class="btn btn-primary mt-2" onclick="copiarEans()"><i class="bi bi-clipboard"></i> Copiar EANs</button>';
+                
+                mostrarResultados('💰 EANs para Precificação', html);
+                
+                // Copiar automaticamente
+                setTimeout(copiarEans, 500);
+            } else {
+                alert('Nenhum EAN disponível para precificação');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao carregar EANs');
+            console.error(error);
+        });
+}
+
+function copiarEans() {
+    const textarea = document.getElementById('eans-textarea');
+    textarea.select();
+    document.execCommand('copy');
+    alert('✅ EANs copiados para área de transferência!');
+}
+
+// ============================================
+// PRESTES A VENCER
+// ============================================
+function verPrestes() {
+    fetch('/api/produtos/prestes')
+        .then(response => response.json())
+        .then(data => {
+            if (data.prestes && data.prestes.length > 0) {
+                let html = `<p class="text-warning">Total: ${data.total} produtos</p>`;
+                html += '<div class="table-responsive">';
+                html += '<table class="table">';
+                html += '<thead><tr><th><input type="checkbox" id="selecionar-todos" onclick="toggleTodos()"></th><th>EAN</th><th>Descrição</th><th>Validade</th><th>Dias</th><th>Sugestão</th></tr></thead><tbody>';
+                
+                data.prestes.forEach(p => {
+                    html += `<tr class="table-warning">`;
+                    html += `<td><input type="checkbox" class="prestes-check" value="${p.ean}"></td>`;
+                    html += `<td><span class="font-mono">${p.ean}</span></td>`;
+                    html += `<td>${p.descricao}</td>`;
+                    html += `<td>${p.validade}</td>`;
+                    html += `<td>${p.dias}</td>`;
+                    html += `<td><span class="badge" style="background: var(--accent-gradient); color: white;">${p.desconto} OFF</span></td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                html += '</div>';
+                html += '<button class="btn btn-success" onclick="retirarSelecionados()"><i class="bi bi-check-circle"></i> Retirar Selecionados</button> ';
+                html += '<button class="btn btn-warning" onclick="retirarTodos()"><i class="bi bi-exclamation-triangle"></i> Retirar Todos</button>';
+                
+                mostrarResultados('⚠️ Produtos Prestes a Vencer', html);
+            } else {
+                alert('Nenhum produto prestes a vencer neste setor');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao carregar prestes');
+            console.error(error);
+        });
+}
+
+function toggleTodos() {
+    const selecionarTodos = document.getElementById('selecionar-todos').checked;
+    const checks = document.querySelectorAll('.prestes-check');
+    checks.forEach(c => c.checked = selecionarTodos);
+}
+
+function retirarSelecionados() {
+    const checks = document.querySelectorAll('.prestes-check:checked');
+    if (checks.length === 0) {
+        alert('Selecione pelo menos um produto');
+        return;
+    }
+    
+    const eans = [];
+    checks.forEach(c => eans.push(c.value));
+    
+    if (confirm(`Retirar ${eans.length} produto(s) da lista de prestes?`)) {
+        fetch('/api/produtos/retirar-prestes', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({eans: eans})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert(`✅ ${data.quantidade} produto(s) retirado(s) com sucesso!`);
+                verPrestes();
+            } else {
+                alert('Erro ao retirar produtos');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao conectar com servidor');
+            console.error(error);
+        });
+    }
+}
+
+function retirarTodos() {
+    const checks = document.querySelectorAll('.prestes-check');
+    if (checks.length === 0) return;
+    
+    const eans = [];
+    checks.forEach(c => eans.push(c.value));
+    
+    if (confirm(`Retirar TODOS os ${eans.length} produtos da lista de prestes?`)) {
+        fetch('/api/produtos/retirar-prestes', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({eans: eans})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert(`✅ ${data.quantidade} produto(s) retirado(s) com sucesso!`);
+                verPrestes();
+            } else {
+                alert('Erro ao retirar produtos');
+            }
+        })
+        .catch(error => {
+            alert('Erro ao conectar com servidor');
+            console.error(error);
+        });
+    }
+}
+
+// ============================================
+// CADASTRO DE PRODUTOS
+// ============================================
+function buscarProduto() {
+    const ean = document.getElementById('ean-input').value.trim();
+    if (!ean) {
+        alert('Digite um EAN');
+        return;
+    }
+    
+    fetch('/api/produtos/buscar/' + ean)
+        .then(response => response.json())
+        .then(data => {
+            const descricaoInfo = document.getElementById('descricao-info');
+            const descricaoTexto = document.getElementById('descricao-texto');
+            const descricaoInput = document.getElementById('descricao-input');
+            
+            if (data.encontrado) {
+                descricaoTexto.innerHTML = `✅ Encontrado: ${data.descricao} (fonte: ${data.fonte})`;
+                descricaoInfo.style.display = 'block';
+                descricaoInput.value = data.descricao;
+            } else {
+                descricaoTexto.innerHTML = '❌ Produto não encontrado. Digite a descrição manualmente.';
+                descricaoInfo.style.display = 'block';
+                descricaoInput.value = '';
+                descricaoInput.focus();
+            }
+        })
+        .catch(error => {
+            alert('Erro ao buscar produto');
+            console.error(error);
+        });
+}
+
+function salvarProduto() {
+    const ean = document.getElementById('ean-input').value.trim();
+    const descricao = document.getElementById('descricao-input').value.trim();
+    const mes = document.getElementById('mes-select').value;
+    const ano = document.getElementById('ano-select').value;
+    
+    if (!ean || !descricao) {
+        alert('Preencha EAN e descrição');
+        return;
+    }
+    
+    fetch('/api/produtos/adicionar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ean, descricao, mes, ano})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            alert('✅ Produto cadastrado com sucesso!');
+            document.getElementById('ean-input').value = '';
+            document.getElementById('descricao-input').value = '';
+            document.getElementById('descricao-info').style.display = 'none';
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCadastro'));
+            modal.hide();
+        } else {
+            alert('Erro ao cadastrar: ' + (data.erro || 'Erro desconhecido'));
+        }
+    })
+    .catch(error => {
+        alert('Erro ao conectar com servidor');
+        console.error(error);
+    });
+}
+
+// ============================================
+// PESQUISA POR DATA
+// ============================================
+function pesquisarPeriodo() {
+    const dataInicial = document.getElementById('data-inicial').value;
+    const dataFinal = document.getElementById('data-final').value;
+    
+    if (!dataInicial && !dataFinal) {
+        alert('Selecione pelo menos uma data');
+        return;
+    }
+    
+    fetch('/api/produtos/pesquisar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({data_inicial: dataInicial, data_final: dataFinal})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.resultados && data.resultados.length > 0) {
+            let periodo = '';
+            if (dataInicial && dataFinal) {
+                periodo = `de ${formatarData(dataInicial)} a ${formatarData(dataFinal)}`;
+            } else if (dataInicial) {
+                periodo = `a partir de ${formatarData(dataInicial)}`;
+            } else {
+                periodo = `até ${formatarData(dataFinal)}`;
+            }
+            
+            let html = `<p class="text-info">Total: ${data.resultados.length} produtos encontrados ${periodo}</p>`;
+            html += '<div class="table-responsive">';
+            html += '<table class="table">';
+            html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th><th>Cadastro</th></tr></thead><tbody>';
+            
+            data.resultados.forEach(p => {
+                html += `<tr>`;
+                html += `<td><span class="font-mono">${p.ean}</span></td>`;
+                html += `<td>${p.descricao}</td>`;
+                html += `<td>${p.validade}</td>`;
+                html += `<td>${p.data_cadastro}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            html += '</div>';
+            html += '<button class="btn btn-primary" onclick="copiarEansPesquisa()"><i class="bi bi-clipboard"></i> Copiar EANs</button>';
+            
+            window.resultadosPesquisa = data.resultados;
+            mostrarResultados('📅 Resultado da Pesquisa', html);
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalPesquisa'));
+            modal.hide();
+        } else {
+            alert('Nenhum produto encontrado neste período');
+        }
+    })
+    .catch(error => {
+        alert('Erro ao pesquisar');
+        console.error(error);
+    });
+}
+
+function pesquisarHoje() {
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('data-inicial').value = hoje;
+    document.getElementById('data-final').value = hoje;
+    pesquisarPeriodo();
+}
+
+function pesquisarSemana() {
+    const hoje = new Date();
+    const semana = new Date();
+    semana.setDate(hoje.getDate() - 7);
+    
+    document.getElementById('data-inicial').value = semana.toISOString().split('T')[0];
+    document.getElementById('data-final').value = hoje.toISOString().split('T')[0];
+    pesquisarPeriodo();
+}
+
+function pesquisarMes() {
+    const hoje = new Date();
+    const mes = new Date();
+    mes.setDate(hoje.getDate() - 30);
+    
+    document.getElementById('data-inicial').value = mes.toISOString().split('T')[0];
+    document.getElementById('data-final').value = hoje.toISOString().split('T')[0];
+    pesquisarPeriodo();
+}
+
+function formatarData(dataStr) {
+    if (!dataStr) return '';
+    const partes = dataStr.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function copiarEansPesquisa() {
+    if (!window.resultadosPesquisa || window.resultadosPesquisa.length === 0) return;
+    
+    const eans = window.resultadosPesquisa.map(p => p.ean);
+    const texto = eans.join('\n');
+    
+    const textarea = document.createElement('textarea');
+    textarea.value = texto;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    
+    alert(`✅ ${eans.length} EANs copiados para área de transferência!`);
+}
+</script>
+{% endblock %}
