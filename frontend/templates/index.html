@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>🎯 CONTROLE DE PRESTES</h3>
+                    <h5>Sistema de Gestão de Estoque</h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Selecione seu setor de trabalho</h5>
+                    
+                    <div class="list-group mb-3" id="setores-lista">
+                        {% for setor in setores %}
+                        <a href="/setor/{{ setor }}" class="list-group-item list-group-item-action">
+                            {{ setor }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="novo-setor" placeholder="Novo setor">
+                        <button class="btn btn-success" type="button" onclick="criarSetor()">Criar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function criarSetor() {
+    const setor = document.getElementById('novo-setor').value.trim().toUpperCase();
+    if (!setor) {
+        alert('Digite um nome para o setor');
+        return;
+    }
+    
+    fetch('/api/setores/novo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({setor: setor})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            window.location.href = '/setor/' + data.setor;
+        } else {
+            alert(data.erro || 'Erro ao criar setor');
+        }
+    })
+    .catch(error => {
+        alert('Erro ao conectar com o servidor');
+        console.error(error);
+    });
+}
+</script>
+{% endblock %}

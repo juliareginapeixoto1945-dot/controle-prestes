@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5>📊 Estatísticas do Estoque</h5>
+        </div>
+        <div class="card-body">
+            <div id="stats-content">Carregando...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+function carregarEstatisticas() {
+    fetch('/api/estatisticas')
+        .then(response => response.json())
+        .then(stats => {
+            let html = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Total Ativo</h5>
+                                <p class="card-text display-4">${stats.total}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">OK (> ${stats.dias_prestes} dias)</h5>
+                                <p class="card-text display-4">${stats.ok}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-warning mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Prestes</h5>
+                                <p class="card-text display-4">${stats.prestes}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-danger mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Vencidos</h5>
+                                <p class="card-text display-4">${stats.vencidos}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-secondary mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Em Falta</h5>
+                                <p class="card-text display-4">${stats.em_falta}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info mb-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Ativos (disponíveis)</h5>
+                                <p class="card-text display-4">${stats.ativos}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <strong>ℹ️ Produtos com prestes retirados:</strong> ${stats.prestes_retirados || 0} produtos foram removidos da contagem.
+                </div>
+            `;
+            
+            if (stats.lista_prestes && stats.lista_prestes.length > 0) {
+                html += '<h5 class="mt-4">🔔 Próximos a vencer:</h5>';
+                html += '<table class="table table-warning">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th><th>Dias</th></tr></thead><tbody>';
+                stats.lista_prestes.forEach(p => {
+                    html += `<tr><td>${p.ean}</td><td>${p.descricao}</td><td>${p.validade}</td><td>${p.dias}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            
+            if (stats.lista_vencidos && stats.lista_vencidos.length > 0) {
+                html += '<h5 class="mt-4">❌ Vencidos:</h5>';
+                html += '<table class="table table-danger">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th></tr></thead><tbody>';
+                stats.lista_vencidos.forEach(p => {
+                    html += `<tr><td>${p.ean}</td><td>${p.descricao}</td><td>${p.validade}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            
+            if (stats.lista_falta && stats.lista_falta.length > 0) {
+                html += '<h5 class="mt-4">🚫 Em Falta:</h5>';
+                html += '<table class="table table-secondary">';
+                html += '<thead><tr><th>EAN</th><th>Descrição</th><th>Validade</th></tr></thead><tbody>';
+                stats.lista_falta.forEach(p => {
+                    html += `<tr><td>${p.ean}</td><td>${p.descricao}</td><td>${p.validade}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            
+            document.getElementById('stats-content').innerHTML = html;
+        });
+}
+
+carregarEstatisticas();
+</script>
+{% endblock %}

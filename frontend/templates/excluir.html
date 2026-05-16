@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5>🗑️ Excluir Produtos</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <strong>⚠️ Atenção:</strong> Esta operação não pode ser desfeita!
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-header">Por EAN</div>
+                        <div class="card-body">
+                            <input type="text" class="form-control mb-2" id="ean-excluir" placeholder="Digite o EAN">
+                            <button class="btn btn-danger" onclick="excluirPorEan()">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-header">Por Descrição</div>
+                        <div class="card-body">
+                            <input type="text" class="form-control mb-2" id="termo-excluir" placeholder="Parte da descrição">
+                            <button class="btn btn-warning" onclick="excluirPorDescricao()">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">Excluir Tudo</div>
+                        <div class="card-body">
+                            <button class="btn btn-danger w-100" onclick="excluirTodos()">Excluir TODOS do setor</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resultado-exclusao" class="mt-4"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function excluirPorEan() {
+    const ean = document.getElementById('ean-excluir').value.trim();
+    if (!ean) return;
+    
+    fetch('/api/produtos/excluir/ean', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ean: ean})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-success">✅ ${data.mensagem}</div>`;
+            document.getElementById('ean-excluir').value = '';
+        } else {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-danger">❌ ${data.erro}</div>`;
+        }
+    });
+}
+
+function excluirPorDescricao() {
+    const termo = document.getElementById('termo-excluir').value.trim();
+    if (!termo || termo.length < 3) {
+        alert('Digite pelo menos 3 caracteres');
+        return;
+    }
+    
+    if (!confirm(`Excluir produtos com "${termo}"?`)) return;
+    
+    fetch('/api/produtos/excluir/descricao', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({termo: termo})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-success">✅ ${data.mensagem}</div>`;
+            document.getElementById('termo-excluir').value = '';
+        } else {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-danger">❌ ${data.erro}</div>`;
+        }
+    });
+}
+
+function excluirTodos() {
+    if (!confirm('⚠️ ISSO EXCLUIRÁ TODOS OS PRODUTOS DO SETOR!\nTem certeza?')) return;
+    if (!confirm('ÚLTIMA CHANCE! Confirmar exclusão em massa?')) return;
+    
+    fetch('/api/produtos/excluir/todos', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-success">✅ ${data.mensagem}</div>`;
+        } else {
+            document.getElementById('resultado-exclusao').innerHTML = 
+                `<div class="alert alert-danger">❌ ${data.erro}</div>`;
+        }
+    });
+}
+</script>
+{% endblock %}

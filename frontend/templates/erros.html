@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-white">
+            <h5>⚠️ Erros do Bip</h5>
+        </div>
+        <div class="card-body">
+            <div id="lista-erros"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function carregarErros() {
+    fetch('/api/erros')
+        .then(response => response.json())
+        .then(data => {
+            let html = '';
+            
+            if (data.erros && data.erros.length > 0) {
+                html = `<p>Total: ${data.erros.length} erro(s)</p>`;
+                html += '<table class="table">';
+                html += '<thead><tr><th>EAN</th><th>Motivo</th><th>Ações</th></tr></thead><tbody>';
+                
+                data.erros.forEach(e => {
+                    html += `<tr>`;
+                    html += `<td>${e.ean}</td>`;
+                    html += `<td>${e.motivo}</td>`;
+                    html += `<td>`;
+                    html += `<button class="btn btn-sm btn-success" onclick="resolverErro('${e.ean}')">Resolver</button> `;
+                    html += `<button class="btn btn-sm btn-danger" onclick="descartarErro('${e.ean}')">Descartar</button>`;
+                    html += `</td>`;
+                    html += `</tr>`;
+                });
+                
+                html += '</tbody></table>';
+            } else {
+                html = '<div class="alert alert-success">Nenhum erro pendente!</div>';
+            }
+            
+            document.getElementById('lista-erros').innerHTML = html;
+        });
+}
+
+function resolverErro(ean) {
+    const descricao = prompt('Digite a descrição do produto:');
+    if (!descricao) return;
+    
+    const mes = prompt('Digite o mês (MM):');
+    const ano = prompt('Digite o ano (AAAA):');
+    
+    if (!mes || !ano) return;
+    
+    fetch('/api/erros/resolver', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ean, descricao, mes, ano})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            alert('✅ Erro resolvido!');
+            carregarErros();
+        } else {
+            alert('Erro ao resolver');
+        }
+    });
+}
+
+function descartarErro(ean) {
+    if (confirm('Descartar este erro?')) {
+        fetch('/api/erros/descartar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ean})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) carregarErros();
+        });
+    }
+}
+
+carregarErros();
+</script>
+{% endblock %}
